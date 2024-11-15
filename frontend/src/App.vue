@@ -13,6 +13,7 @@ const authStore = useAuthStore()
 
       <div class="flex items-center space-x-6" v-if="authStore.user">
         <p class="text-sm text-slate-300">Hoşgeldin {{ authStore.user.name }}</p>
+        <RouterLink class="nav-link" :to="{ name: 'createPost' }">Yeni Post</RouterLink>
         <form @submit.prevent="authStore.logout">
           <button class="nav-link">Çıkış</button>
         </form>
