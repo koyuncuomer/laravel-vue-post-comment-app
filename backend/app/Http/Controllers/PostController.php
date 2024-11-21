@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller implements HasMiddleware
 {
@@ -32,8 +33,18 @@ class PostController extends Controller implements HasMiddleware
     {
         $fields = $request->validate([
             'title' => 'required|max:255',
-            'body' => 'required'
+            'body' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('posts', $fileName, 'public');
+            $imageUrl = asset('storage/' . $path);
+        }
+        $fields['image'] = $imageUrl;
 
         $post = $request->user()->posts()->create($fields);
 
@@ -57,8 +68,23 @@ class PostController extends Controller implements HasMiddleware
 
         $fields = $request->validate([
             'title' => 'required|max:255',
-            'body' => 'required'
+            'body' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
+        $imageUrl = null;
+        if ($request->hasFile('image')) {
+            if ($post->image) {
+                $oldImagePath = str_replace(asset('storage/'), '', $post->image);
+                Storage::disk('public')->delete($oldImagePath);
+            }
+
+            $file = $request->file('image');
+            $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('posts', $fileName, 'public');
+            $imageUrl = asset('storage/' . $path);
+        }
+        $fields['image'] = $imageUrl;
 
         $post->update($fields);
 
