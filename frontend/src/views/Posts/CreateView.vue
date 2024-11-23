@@ -5,12 +5,16 @@ import { reactive } from 'vue';
 
 const formData = reactive({
   title: "",
-  body: ""
+  body: "",
+  image: null
 })
 
 const { errors } = storeToRefs(usePostsStore())
 const { createPost } = usePostsStore()
 
+const handleImageChange = (event) => {
+  formData.image = event.target.files[0];
+};
 </script>
 
 <template>
@@ -25,6 +29,9 @@ const { createPost } = usePostsStore()
       <div>
         <textarea rows="6" placeholder="İçerik" v-model="formData.body"></textarea>
         <p v-if="errors.body" class="error">{{ errors.body[0] }}</p>
+      </div>
+      <div>
+        <input @change="handleImageChange" type="file" accept="image/*" />
       </div>
       <button class="primary-btn">Oluştur</button>
     </form>

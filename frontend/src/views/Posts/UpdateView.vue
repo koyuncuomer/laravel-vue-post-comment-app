@@ -7,7 +7,8 @@ import { useRoute, useRouter } from 'vue-router';
 
 const formData = reactive({
     title: "",
-    body: ""
+    body: "",
+    image: null
 })
 
 const route = useRoute()
@@ -28,6 +29,10 @@ onMounted(async () => {
         formData.body = post.value.body
     }
 })
+
+const handleImageChange = (event) => {
+    formData.image = event.target.files[0];
+};
 </script>
 
 <template>
@@ -42,6 +47,9 @@ onMounted(async () => {
             <div>
                 <textarea rows="6" placeholder="İçerik" v-model="formData.body"></textarea>
                 <p v-if="errors.body" class="error">{{ errors.body[0] }}</p>
+            </div>
+            <div>
+                <input @change="handleImageChange" type="file" accept="image/*" />
             </div>
             <button class="primary-btn">Güncelle</button>
         </form>

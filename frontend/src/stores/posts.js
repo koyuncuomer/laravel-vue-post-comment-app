@@ -28,9 +28,18 @@ export const usePostsStore = defineStore("postsStore", {
             }
         },
 
-        async createPost(formData) {
+        async createPost(data) {
             try {
-                const response = await axios.post("/api/posts", formData);
+                const formData = new FormData();
+                formData.append("title", data.title);
+                formData.append("body", data.body);
+                if (data.image) {
+                    formData.append("image", data.image);
+                }
+
+                const response = await axios.post("/api/posts", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
                 this.errors = {};
                 this.router.push({ name: "home" });
                 return response.data;
@@ -56,13 +65,24 @@ export const usePostsStore = defineStore("postsStore", {
             }
         },
 
-        async updatePost(post, formData) {
+        async updatePost(post, data) {
             const authStore = useAuthStore();
             if (authStore.user.id === post.user_id) {
                 try {
-                    const response = await axios.put(
+                    const formData = new FormData();
+                    formData.append("title", data.title);
+                    formData.append("body", data.body);
+                    if (data.image) {
+                        formData.append("image", data.image);
+                    }
+
+                    // PUT ile FormData kullanarak istek attığımda laravel tarafında alanlara erişemiyorum bu yüzden isteği POST olarak atıyorum
+                    // ve FormData içerisinde _method: put olacak şekilde alan tanımlıyorum.
+                    formData.append("_method", "put");
+                    const response = await axios.post(
                         `/api/posts/${post.id}`,
-                        formData
+                        formData,
+                        { headers: { "Content-Type": "multipart/form-data" } }
                     );
                     this.errors = {};
                     this.router.push({ name: "home" });
