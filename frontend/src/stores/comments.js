@@ -12,7 +12,9 @@ export const useCommentsStore = defineStore("commentsStore", {
     actions: {
         async getPostComments(postId) {
             try {
-                const response = await axios.get(`/api/posts/${postId}/comments`);
+                const response = await axios.get(
+                    `/api/posts/${postId}/comments`
+                );
                 return response.data;
             } catch (error) {
                 throw error.response.data;
@@ -29,6 +31,36 @@ export const useCommentsStore = defineStore("commentsStore", {
             } catch (error) {
                 this.errors = error.response.data.errors;
                 throw error.response.data;
+            }
+        },
+
+        async deleteComment(comment) {
+            const authStore = useAuthStore();
+            if (authStore.user.is_admin) {
+                try {
+                    const response = await axios.delete(
+                        `/api/comments/${comment.id}`
+                    );
+                    return response.data;
+                } catch (error) {
+                    throw error.response.data;
+                }
+            }
+        },
+
+        async updateComment(formData) {
+            const authStore = useAuthStore();
+            if (authStore.user.is_admin) {
+                try {
+                    const response = await axios.put(
+                        `/api/comments/${formData.id}`,
+                        formData
+                    );
+                    return response.data;
+                } catch (error) {
+                    this.errors = error.response.data.errors;
+                    throw error.response.data;
+                }
             }
         },
     },
